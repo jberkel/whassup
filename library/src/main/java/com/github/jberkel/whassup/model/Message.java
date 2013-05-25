@@ -77,15 +77,26 @@ public class Message {
         return new Date(timestamp);
     }
 
+    public String getText() {
+        return data;
+    }
+
     public String getNumber() {
         if (TextUtils.isEmpty(key_remote_jid)) return  null;
-
         String[] components = key_remote_jid.split("@", 2);
-
         if (components.length > 1) {
             return components[0];
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "number='" + getNumber() + '\'' +
+                ", text='" + getText() + '\'' +
+                ", timestamp=" + getTimestamp() +
+                '}';
     }
 }

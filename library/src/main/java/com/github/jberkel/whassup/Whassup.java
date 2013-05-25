@@ -27,9 +27,12 @@ public class Whassup {
     private final DBCrypto dbCrypto;
     private final DBProvider dbProvider;
 
+    public Whassup(Context context) {
+        this(context, new DBCrypto(), new FileSystemDBProvider());
+    }
 
     public Whassup(Context context, DBCrypto decryptor, DBProvider dbProvider) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
         this.dbCrypto = decryptor;
         this.dbProvider = dbProvider;
     }
