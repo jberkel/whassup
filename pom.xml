@@ -86,6 +86,7 @@
         <developerConnection>scm:git:git@github.com:${github.username}/${github.permalink}.git
         </developerConnection>
     </scm>
+
     <modules>
         <module>library</module>
         <module>tests</module>
@@ -99,5 +100,4 @@
             <snapshots/>
         </repository>
     </repositories>
-
 </project>
