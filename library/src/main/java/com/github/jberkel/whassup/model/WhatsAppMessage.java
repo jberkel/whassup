@@ -163,6 +163,10 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
                 media.getFile().canRead();
     }
 
+    public boolean hasText() {
+        return !TextUtils.isEmpty(data);
+    }
+
     @Override
     public String toString() {
         return "Message{" +

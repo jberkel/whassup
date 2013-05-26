@@ -48,4 +48,24 @@ public class WhatsAppMessageTest {
         assertThat(m2.compareTo(m2)).isEqualTo(0);
         assertThat(m1.compareTo(m1)).isEqualTo(0);
     }
+
+    @Test
+    public void shouldHaveTextIfNonEmptyString() throws Exception {
+        WhatsAppMessage m = new WhatsAppMessage();
+        assertThat(m.hasText()).isFalse();
+
+        m.data = "";
+        assertThat(m.hasText()).isFalse();
+
+        m.data = "some text";
+        assertThat(m.hasText()).isTrue();
+    }
+
+    @Test
+    public void shouldCheckIfReceived() throws Exception {
+        WhatsAppMessage m = new WhatsAppMessage();
+        assertThat(m.isReceived()).isTrue();
+        m.key_from_me = 1;
+        assertThat(m.isReceived()).isFalse();
+    }
 }
