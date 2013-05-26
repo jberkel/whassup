@@ -3,7 +3,7 @@ package com.github.jberkel.whassup;
 import android.database.Cursor;
 import com.github.jberkel.whassup.crypto.DBCrypto;
 import com.github.jberkel.whassup.model.Fixtures;
-import com.github.jberkel.whassup.model.Message;
+import com.github.jberkel.whassup.model.WhatsAppMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,7 @@ public class WhassupTest {
     @Test
     public void shouldGetAllMessages() throws Exception {
         when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
-        List<Message> messages = whassup.getMessages();
+        List<WhatsAppMessage> messages = whassup.getMessages();
 
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(76);
@@ -41,7 +41,7 @@ public class WhassupTest {
     @Test
     public void shouldGetAllMessagesSince() throws Exception {
         when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
-        List<Message> messages = whassup.getMessagesSince(1367349391104L);
+        List<WhatsAppMessage> messages = whassup.getMessagesSince(1367349391104L);
 
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(9);

@@ -1,7 +1,7 @@
 package com.github.jberkel.whassup;
 
 import com.github.jberkel.whassup.model.ChatList;
-import com.github.jberkel.whassup.model.Message;
+import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 import java.io.File;
 import java.sql.Connection;
@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Random;
 
 import static android.provider.BaseColumns._ID;
-import static com.github.jberkel.whassup.model.Message.FIELD_DATA;
-import static com.github.jberkel.whassup.model.Message.FIELD_KEY_REMOTE_JID;
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.DATA;
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.KEY_REMOTE_JID;
 
 /**
  * Anonymises an unencrypted database.
@@ -48,14 +48,14 @@ public class Anonymizer {
         final Random random = new Random(System.currentTimeMillis());
         while (set.next()) {
             long id = set.getLong(_ID);
-            String remoteId = set.getString(FIELD_KEY_REMOTE_JID);
+            String remoteId = set.getString(KEY_REMOTE_JID.toString());
             String mappedId = idMappings.get(remoteId);
             if (mappedId == null) {
                 mappedId = String.format("%s@s.whatsapp.net", String.valueOf(Math.abs(random.nextLong())));
                 idMappings.put(remoteId, mappedId);
             }
             PreparedStatement update = conn.prepareStatement(
-                    "UPDATE "+ Message.TABLE+" SET "+ FIELD_DATA + " = ? "  +
+                    "UPDATE "+ WhatsAppMessage.TABLE+" SET "+ DATA + " = ? "  +
                     "WHERE " +_ID+" = ?"
             );
             update.setString(1, generateMessage(random));
@@ -63,7 +63,7 @@ public class Anonymizer {
             update.execute();
         }
         for (Map.Entry<String, String> e : idMappings.entrySet()) {
-            replaceJid(Message.TABLE, conn, e.getKey(), e.getValue());
+            replaceJid(WhatsAppMessage.TABLE, conn, e.getKey(), e.getValue());
             replaceJid(ChatList.TABLE, conn, e.getKey(), e.getValue());
         }
         set.close();
@@ -72,8 +72,8 @@ public class Anonymizer {
 
     private void replaceJid(String table, Connection conn, String old, String _new) throws SQLException {
         PreparedStatement update = conn.prepareStatement(
-                "UPDATE "+ table+" SET "+ FIELD_KEY_REMOTE_JID+" = ? " +
-                        "WHERE "+FIELD_KEY_REMOTE_JID+" = ?"
+                "UPDATE "+ table+" SET "+ KEY_REMOTE_JID+" = ? " +
+                        "WHERE "+ KEY_REMOTE_JID+" = ?"
         );
         update.setString(1, _new);
         update.setString(2, old);

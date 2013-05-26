@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-import com.github.jberkel.whassup.model.Message;
+import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +26,7 @@ public class ExampleActivity extends Activity {
 
     private void fetchMessages(Whassup whassup) {
         try {
-            List<Message> messages = whassup.getMessages();
+            List<WhatsAppMessage> messages = whassup.getMessages();
             Log.d(TAG, "got " + messages);
         } catch (IOException e) {
             Log.e(TAG, "error getting messages", e);
@@ -41,7 +41,7 @@ public class ExampleActivity extends Activity {
 
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    Message m = new Message(cursor);
+                    WhatsAppMessage m = new WhatsAppMessage(cursor);
                     Log.d(TAG, "got "+m);
                 }
             } else {

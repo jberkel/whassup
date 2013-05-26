@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteQuery;
 import android.os.Environment;
 import android.util.Log;
 import com.github.jberkel.whassup.crypto.DBCrypto;
-import com.github.jberkel.whassup.model.Message;
+import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,13 +68,13 @@ public class Whassup {
      * @return a list of messages
      * @throws IOException
      */
-    public List<Message> getMessagesSince(long timestamp) throws IOException {
+    public List<WhatsAppMessage> getMessagesSince(long timestamp) throws IOException {
         Cursor cursor = queryMessagesSince(timestamp);
         try {
             if (cursor != null) {
-                List<Message> messages = new ArrayList<Message>(cursor.getCount());
+                List<WhatsAppMessage> messages = new ArrayList<WhatsAppMessage>(cursor.getCount());
                 while (cursor.moveToNext()) {
-                    messages.add(new Message(cursor));
+                    messages.add(new WhatsAppMessage(cursor));
                 }
                 return messages;
             } else {
@@ -87,7 +87,7 @@ public class Whassup {
         }
     }
 
-    public List<Message> getMessages() throws IOException {
+    public List<WhatsAppMessage> getMessages() throws IOException {
         return getMessagesSince(0);
     }
 
@@ -104,10 +104,10 @@ public class Whassup {
         String selection = null;
         String[] selectionArgs = null;
         if (since > 0) {
-            selection = String.format("%s > ?", Message.FIELD_TIMESTAMP);
+            selection = String.format("%s > ?", WhatsAppMessage.Fields.TIMESTAMP);
             selectionArgs = new String[]{String.valueOf(since)};
         }
-        return db.query(Message.TABLE, null, selection, selectionArgs, null, null, null);
+        return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, null);
     }
 
     private SQLiteDatabase getSqLiteDatabase(final File dbFile) {
