@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -26,34 +25,57 @@ public class WhassupTest {
 
     @Before public void before() {
         initMocks(this);
-        whassup = new Whassup(Robolectric.application, new DBCrypto(), dbProvider);
+        whassup = new Whassup(new DBCrypto(), dbProvider);
+        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
     }
 
     @Test
     public void shouldGetAllMessages() throws Exception {
-        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
         List<WhatsAppMessage> messages = whassup.getMessages();
-
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(76);
     }
 
     @Test
-    public void shouldGetAllMessagesSince() throws Exception {
-        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
-        List<WhatsAppMessage> messages = whassup.getMessagesSince(1367349391104L);
+    public void shouldQueryMessages() throws Exception {
+        Cursor cursor = whassup.queryMessages();
+        assertThat(cursor).isNotNull();
+        assertThat(cursor.getCount()).isEqualTo(76);
+        cursor.close();
+    }
 
+    @Test
+    public void shouldGetMessagesSinceASpecificTimestamp() throws Exception {
+        List<WhatsAppMessage> messages = whassup.getMessages(1367349391104L, -1);
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(9);
     }
 
     @Test
-    public void shouldQueryMessages() throws Exception {
-        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
-        Cursor cursor = whassup.queryMessages();
+    public void shouldQueryMessagesSinceASpecificTimestamp() throws Exception {
+        Cursor cursor = whassup.queryMessages(1367349391104L, -1);
         assertThat(cursor).isNotNull();
-        assertThat(cursor.getCount()).isEqualTo(76);
-        cursor.close();
+        assertThat(cursor.getCount()).isEqualTo(9);
+    }
+
+    @Test
+    public void shouldGetMessagesSinceASpecificTimestampAndLimit() throws Exception {
+        List<WhatsAppMessage> messages = whassup.getMessages(1367349391104L, 3);
+        assertThat(messages).isNotEmpty();
+        assertThat(messages).hasSize(3);
+    }
+
+    @Test
+    public void shouldQueryMessagesSinceASpecificTimestampAndLimit() throws Exception {
+        Cursor cursor = whassup.queryMessages(1367349391104L, 3);
+        assertThat(cursor).isNotNull();
+        assertThat(cursor.getCount()).isEqualTo(3);
+    }
+
+    @Test
+    public void shouldReturnMessagesInDescendingTimestampOrder() throws Exception {
+        List<WhatsAppMessage> messages = whassup.getMessages();
+        assertThat(messages).isSortedAccordingTo(WhatsAppMessage.TimestampComparator.INSTANCE);
     }
 
     @Test

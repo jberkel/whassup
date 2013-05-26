@@ -18,7 +18,7 @@ public class ExampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d("ExampleActivity", "onCreate()");
 
-        Whassup whassup = new Whassup(this);
+        Whassup whassup = new Whassup();
 
         fetchMessageCursor(whassup);
         fetchMessages(whassup);

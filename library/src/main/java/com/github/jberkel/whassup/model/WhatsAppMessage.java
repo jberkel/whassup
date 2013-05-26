@@ -4,13 +4,14 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
 /**
  * Represents a whatsapp message
  */
-public class WhatsAppMessage {
+public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     public static final String TABLE = "messages";
 
     public WhatsAppMessage() {}
@@ -123,6 +124,11 @@ public class WhatsAppMessage {
                 '}';
     }
 
+    @Override
+    public int compareTo(WhatsAppMessage another) {
+        return TimestampComparator.INSTANCE.compare(this, another);
+    }
+
     public enum Fields {
         KEY_REMOTE_JID,
         KEY_FROM_ME,
@@ -138,6 +144,23 @@ public class WhatsAppMessage {
 
         @Override public String toString() {
             return this.name().toLowerCase(Locale.ENGLISH);
+        }
+    }
+
+    public static class TimestampComparator implements Comparator<WhatsAppMessage> {
+        public static final TimestampComparator INSTANCE = new TimestampComparator();
+
+        @Override
+        public int compare(WhatsAppMessage lhs, WhatsAppMessage rhs) {
+            if (lhs == rhs) {
+                return 0;
+            } else if (lhs == null) {
+                return 1;
+            } else if (rhs == null) {
+                return -1;
+            } else {
+                return rhs.getTimestamp().compareTo(lhs.getTimestamp());
+            }
         }
     }
 }

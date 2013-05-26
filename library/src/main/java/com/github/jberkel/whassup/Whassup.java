@@ -1,6 +1,5 @@
 package com.github.jberkel.whassup;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
@@ -26,16 +25,14 @@ public class Whassup {
 
     private static final String CURRENT_DB = "msgstore.db.crypt";
 
-    private final Context mContext;
     private final DBCrypto dbCrypto;
     private final DBProvider dbProvider;
 
-    public Whassup(Context context) {
-        this(context, new DBCrypto(), new FileSystemDBProvider());
+    public Whassup() {
+        this(new DBCrypto(), new FileSystemDBProvider());
     }
 
-    public Whassup(Context context, DBCrypto decryptor, DBProvider dbProvider) {
-        this.mContext = context.getApplicationContext();
+    public Whassup(DBCrypto decryptor, DBProvider dbProvider) {
         this.dbCrypto = decryptor;
         this.dbProvider = dbProvider;
     }
@@ -45,31 +42,33 @@ public class Whassup {
      * @throws IOException
      */
     public Cursor queryMessages() throws IOException {
-        return queryMessagesSince(0);
+        return queryMessages(0, -1);
     }
 
     /**
      * @param timestamp a timestamp, epoch format
+     * @param max how many messages to fetch or -1 for all
      * @return a cursor with messages after timestamp
      * @throws IOException
      */
-    public Cursor queryMessagesSince(long timestamp) throws IOException {
+    public Cursor queryMessages(long timestamp, int max) throws IOException {
         File currentDB = dbProvider.getCurrent();
         if (currentDB == null) {
             return null;
         } else {
-            return getCursorFromDB(decryptDB(currentDB), timestamp);
+            return getCursorFromDB(decryptDB(currentDB), timestamp, max);
         }
     }
 
     /**
      * Convenience method which reads all messages and converts them into model objects.
      * @param timestamp fetch all message since timestamp
+     * @param max how many messages to fetch, -1 for all
      * @return a list of messages
      * @throws IOException
      */
-    public List<WhatsAppMessage> getMessagesSince(long timestamp) throws IOException {
-        Cursor cursor = queryMessagesSince(timestamp);
+    public List<WhatsAppMessage> getMessages(long timestamp, int max) throws IOException {
+        Cursor cursor = queryMessages(timestamp, max);
         try {
             if (cursor != null) {
                 List<WhatsAppMessage> messages = new ArrayList<WhatsAppMessage>(cursor.getCount());
@@ -88,7 +87,7 @@ public class Whassup {
     }
 
     public List<WhatsAppMessage> getMessages() throws IOException {
-        return getMessagesSince(0);
+        return getMessages(0, -1);
     }
 
     /**
@@ -98,16 +97,22 @@ public class Whassup {
         return dbProvider.getCurrent() != null;
     }
 
-    private Cursor getCursorFromDB(final File dbFile, long since) throws IOException {
+    private Cursor getCursorFromDB(final File dbFile, long since, int max) throws IOException {
         Log.d(TAG, "using DB "+dbFile);
         SQLiteDatabase db = getSqLiteDatabase(dbFile);
+        String limit = null;
         String selection = null;
         String[] selectionArgs = null;
         if (since > 0) {
             selection = String.format("%s > ?", WhatsAppMessage.Fields.TIMESTAMP);
             selectionArgs = new String[]{String.valueOf(since)};
         }
-        return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, null);
+        if (max > 0) {
+            limit = String.valueOf(max);
+        }
+        final String orderBy = WhatsAppMessage.Fields.TIMESTAMP + " DESC";
+
+        return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, orderBy, limit);
     }
 
     private SQLiteDatabase getSqLiteDatabase(final File dbFile) {
@@ -148,7 +153,12 @@ public class Whassup {
             if (Environment.MEDIA_MOUNTED.equals(state)) {
                 File db = new File(DB_PATH, CURRENT_DB);
                 if (db.exists()) {
-                    return db;
+                    if (db.canRead()) {
+                        return db;
+                    } else {
+                        Log.d(TAG, "db "+db+" exists but is not readable");
+                        return null;
+                    }
                 } else {
                     Log.d(TAG, "db "+db+" does not exist");
                     return null;

@@ -33,4 +33,19 @@ public class WhatsAppMessageTest {
         m.key_remote_jid = "foobaz";
         assertThat(m.getNumber()).isNull();
     }
+
+    @Test
+    public void shouldImplementComparableBasedOnTimestamp() throws Exception {
+        WhatsAppMessage m1 = new WhatsAppMessage();
+        WhatsAppMessage m2 = new WhatsAppMessage();
+
+        m1.timestamp = 1;
+        m2.timestamp = 2;
+
+        assertThat(m1.compareTo(m2)).isGreaterThan(0);
+        assertThat(m2.compareTo(m1)).isLessThan(0);
+
+        assertThat(m2.compareTo(m2)).isEqualTo(0);
+        assertThat(m1.compareTo(m1)).isEqualTo(0);
+    }
 }
