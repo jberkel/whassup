@@ -10,6 +10,34 @@ import java.util.Locale;
 
 /**
  * Represents a whatsapp message
+ *
+ * CREATE TABLE messages (_id INTEGER PRIMARY KEY AUTOINCREMENT,
+ *      key_remote_jid TEXT NOT NULL,
+ *      key_from_me INTEGER,
+ *      key_id TEXT NOT NULL,
+ *      status INTEGER,
+ *      needs_push INTEGER,
+ *      data TEXT,
+ *      timestamp INTEGER,
+ *      media_url TEXT,
+ *      media_mime_type TEXT,
+ *      media_wa_type TEXT,
+ *      media_size INTEGER,
+ *      media_name TEXT,
+ *      media_hash TEXT,
+ *      latitude REAL,
+ *      longitude REAL,
+ *      thumb_image TEXT,
+ *      remote_resource TEXT,
+ *      received_timestamp INTEGER,
+ *      send_timestamp INTEGER,
+ *      receipt_server_timestamp INTEGER,
+ *      receipt_device_timestamp INTEGER,
+ *      raw_data BLOB,
+ *      recipient_count INTEGER,
+ *      media_duration INTEGER,
+ *      origin INTEGER
+ *  );
  */
 public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     public static final String TABLE = "messages";
@@ -22,7 +50,7 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         this.key_from_me = c.getInt(c.getColumnIndex(Fields.KEY_FROM_ME.toString()));
         this.timestamp = c.getLong(c.getColumnIndex(Fields.TIMESTAMP.toString()));
         this.data = c.getString(c.getColumnIndex(Fields.DATA.toString()));
-        this.raw_data = c.getString(c.getColumnIndex(Fields.RAW_DATA.toString()));
+        this.raw_data = c.getBlob(c.getColumnIndex(Fields.RAW_DATA.toString()));
         this.status = c.getInt(c.getColumnIndex(Fields.STATUS.toString()));
         this.key_id = c.getString(c.getColumnIndex(Fields.KEY_ID.toString()));
         this.longitude = c.getDouble(c.getColumnIndex(Fields.LONGITUDE.toString()));
@@ -59,7 +87,7 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
      * textual content of the message
      */
     String data;
-    String raw_data;
+    byte[] raw_data;
 
     /**
      * epoch in seconds
