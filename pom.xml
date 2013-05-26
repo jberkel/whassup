@@ -42,6 +42,10 @@
     </build>
 
     <distributionManagement>
+        <repository>
+          <id>repo</id>
+          <url>http://zegoggl.es:8081/nexus/content/repositories/releases/</url>
+        </repository>
         <snapshotRepository>
             <id>snapshot-repo</id>
             <url>http://zegoggl.es:8081/nexus/content/repositories/snapshots/</url>
