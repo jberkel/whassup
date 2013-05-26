@@ -2,7 +2,10 @@ package com.github.jberkel.whassup;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQuery;
 import android.os.Environment;
 import android.util.Log;
 import com.github.jberkel.whassup.crypto.DBCrypto;
@@ -37,33 +40,37 @@ public class Whassup {
         this.dbProvider = dbProvider;
     }
 
-    public List<Message> getAllMessages() throws IOException {
-        return getMessagesSince(0);
+    /**
+     * @return a cursor with all available messages
+     * @throws IOException
+     */
+    public Cursor queryMessages() throws IOException {
+        return queryMessagesSince(0);
     }
 
-    public List<Message> getMessagesSince(long timestamp) throws IOException {
+    /**
+     * @param timestamp a timestamp, epoch format
+     * @return a cursor with messages after timestamp
+     * @throws IOException
+     */
+    public Cursor queryMessagesSince(long timestamp) throws IOException {
         File currentDB = dbProvider.getCurrent();
         if (currentDB == null) {
-            return Collections.emptyList();
+            return null;
         } else {
-            return getMessagesFromDB(currentDB, timestamp);
+            return getCursorFromDB(decryptDB(currentDB), timestamp);
         }
     }
 
-    private List<Message> getMessagesFromDB(File in, long since) throws IOException {
-        File decrypted = decryptDB(in);
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(decrypted.getAbsolutePath(), null, 0);
-
-        Cursor cursor = null;
+    /**
+     * Convenience method which reads all messages and converts them into model objects.
+     * @param timestamp fetch all message since timestamp
+     * @return a list of messages
+     * @throws IOException
+     */
+    public List<Message> getMessagesSince(long timestamp) throws IOException {
+        Cursor cursor = queryMessagesSince(timestamp);
         try {
-            String selection = null;
-            String[] selectionArgs = null;
-            if (since > 0) {
-                selection = String.format("%s > ?", Message.FIELD_TIMESTAMP);
-                selectionArgs = new String[] { String.valueOf(since) };
-            }
-
-            cursor = db.query(Message.TABLE, null, selection, selectionArgs, null, null, null);
             if (cursor != null) {
                 List<Message> messages = new ArrayList<Message>(cursor.getCount());
                 while (cursor.moveToNext()) {
@@ -78,6 +85,49 @@ public class Whassup {
                 cursor.close();
             }
         }
+    }
+
+    public List<Message> getMessages() throws IOException {
+        return getMessagesSince(0);
+    }
+
+    /**
+     * @return if there is a whatsapp backup available
+     */
+    public boolean hasBackupDB() {
+        return dbProvider.getCurrent() != null;
+    }
+
+    private Cursor getCursorFromDB(final File dbFile, long since) throws IOException {
+        Log.d(TAG, "using DB "+dbFile);
+        SQLiteDatabase db = getSqLiteDatabase(dbFile);
+        String selection = null;
+        String[] selectionArgs = null;
+        if (since > 0) {
+            selection = String.format("%s > ?", Message.FIELD_TIMESTAMP);
+            selectionArgs = new String[]{String.valueOf(since)};
+        }
+        return db.query(Message.TABLE, null, selection, selectionArgs, null, null, null);
+    }
+
+    private SQLiteDatabase getSqLiteDatabase(final File dbFile) {
+        return SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), new SQLiteDatabase.CursorFactory() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public Cursor newCursor(final SQLiteDatabase db, SQLiteCursorDriver driver, String editTable, SQLiteQuery query) {
+                return new SQLiteCursor(db, driver, editTable, query) {
+                    @Override
+                    public void close() {
+                        Log.d(TAG, "closing cursor");
+                        super.close();
+                        db.close();
+                        if (!dbFile.delete()) {
+                            Log.w(TAG, "could not delete database " + dbFile);
+                        }
+                    }
+                };
+            }
+        }, SQLiteDatabase.OPEN_READONLY);
     }
 
     private File decryptDB(File in) throws IOException {

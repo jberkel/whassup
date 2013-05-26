@@ -1,5 +1,6 @@
 package com.github.jberkel.whassup;
 
+import android.database.Cursor;
 import com.github.jberkel.whassup.crypto.DBCrypto;
 import com.github.jberkel.whassup.model.Fixtures;
 import com.github.jberkel.whassup.model.Message;
@@ -31,7 +32,7 @@ public class WhassupTest {
     @Test
     public void shouldGetAllMessages() throws Exception {
         when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
-        List<Message> messages = whassup.getAllMessages();
+        List<Message> messages = whassup.getMessages();
 
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(76);
@@ -44,5 +45,22 @@ public class WhassupTest {
 
         assertThat(messages).isNotEmpty();
         assertThat(messages).hasSize(9);
+    }
+
+    @Test
+    public void shouldQueryMessages() throws Exception {
+        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
+        Cursor cursor = whassup.queryMessages();
+        assertThat(cursor).isNotNull();
+        assertThat(cursor.getCount()).isEqualTo(76);
+        cursor.close();
+    }
+
+    @Test
+    public void shouldCheckIfDbIsAvailable() throws Exception {
+        when(dbProvider.getCurrent()).thenReturn(null);
+        assertThat(whassup.hasBackupDB()).isFalse();
+        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
+        assertThat(whassup.hasBackupDB()).isTrue();
     }
 }
