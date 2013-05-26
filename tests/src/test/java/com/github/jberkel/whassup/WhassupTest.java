@@ -73,9 +73,12 @@ public class WhassupTest {
     }
 
     @Test
-    public void shouldReturnMessagesInDescendingTimestampOrder() throws Exception {
+    public void shouldReturnMessagesInAscendingTimestampOrder() throws Exception {
         List<WhatsAppMessage> messages = whassup.getMessages();
         assertThat(messages).isSortedAccordingTo(WhatsAppMessage.TimestampComparator.INSTANCE);
+        WhatsAppMessage first = messages.get(0);
+        WhatsAppMessage last = messages.get(messages.size() - 1);
+        assertThat(first.getTimestamp()).isBefore(last.getTimestamp());
     }
 
     @Test

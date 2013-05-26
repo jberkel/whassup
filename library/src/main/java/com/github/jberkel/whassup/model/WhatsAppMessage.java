@@ -159,7 +159,7 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
             } else if (rhs == null) {
                 return -1;
             } else {
-                return rhs.getTimestamp().compareTo(lhs.getTimestamp());
+                return lhs.getTimestamp().compareTo(rhs.getTimestamp());
             }
         }
     }

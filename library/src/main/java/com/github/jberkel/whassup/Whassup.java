@@ -110,7 +110,7 @@ public class Whassup {
         if (max > 0) {
             limit = String.valueOf(max);
         }
-        final String orderBy = WhatsAppMessage.Fields.TIMESTAMP + " DESC";
+        final String orderBy = WhatsAppMessage.Fields.TIMESTAMP + " ASC";
 
         return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, orderBy, limit);
     }

@@ -42,8 +42,8 @@ public class WhatsAppMessageTest {
         m1.timestamp = 1;
         m2.timestamp = 2;
 
-        assertThat(m1.compareTo(m2)).isGreaterThan(0);
-        assertThat(m2.compareTo(m1)).isLessThan(0);
+        assertThat(m1.compareTo(m2)).isLessThan(0);
+        assertThat(m2.compareTo(m1)).isGreaterThan(0);
 
         assertThat(m2.compareTo(m2)).isEqualTo(0);
         assertThat(m1.compareTo(m1)).isEqualTo(0);
