@@ -1,4 +1,4 @@
-package com.github.jberkel.whassup;
+package com.github.jberkel.whassup.helper;
 
 import com.github.jberkel.whassup.model.ChatList;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
@@ -43,6 +43,7 @@ public class Anonymizer {
         Connection conn = DriverManager.getConnection("jdbc:sqlite:"+in.getAbsolutePath());
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM messages");
         ResultSet set = stmt.executeQuery();
+
 
         final Map<String, String> idMappings = new HashMap<String, String>();
         final Random random = new Random(System.currentTimeMillis());

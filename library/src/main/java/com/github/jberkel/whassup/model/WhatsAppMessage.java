@@ -50,19 +50,21 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         this.key_from_me = c.getInt(c.getColumnIndex(Fields.KEY_FROM_ME.toString()));
         this.timestamp = c.getLong(c.getColumnIndex(Fields.TIMESTAMP.toString()));
         this.data = c.getString(c.getColumnIndex(Fields.DATA.toString()));
-        this.raw_data = c.getBlob(c.getColumnIndex(Fields.RAW_DATA.toString()));
         this.status = c.getInt(c.getColumnIndex(Fields.STATUS.toString()));
         this.key_id = c.getString(c.getColumnIndex(Fields.KEY_ID.toString()));
         this.longitude = c.getDouble(c.getColumnIndex(Fields.LONGITUDE.toString()));
         this.latitude = c.getDouble(c.getColumnIndex(Fields.LATITUDE.toString()));
         this.needs_push = c.getInt(c.getColumnIndex(Fields.NEEDS_PUSH.toString()));
         this.recipient_count = c.getInt(c.getColumnIndex(Fields.RECIPIENT_COUNT.toString()));
+        this.origin = c.getInt(c.getColumnIndex(Fields.ORIGIN.toString()));
+        this.media = new Media(c);
+        this.receipt = new Receipt(c);
     }
 
     long _id;
 
     /**
-     * 4915775302629@s.whatsapp.net
+     * 49157712345@s.whatsapp.net
      */
     String key_remote_jid;
 
@@ -87,7 +89,6 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
      * textual content of the message
      */
     String data;
-    byte[] raw_data;
 
     /**
      * epoch in seconds
@@ -100,10 +101,12 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     double longitude;
     double latitude;
 
-    String thumb_image;
+
     String remote_resource;
 
     int recipient_count;
+
+    int origin;
 
     public long getId() {
         return _id;
@@ -143,12 +146,21 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         }
     }
 
+    public Media getMedia() {
+        return media;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
                 "number='" + getNumber() + '\'' +
                 ", text='" + getText() + '\'' +
                 ", timestamp=" + getTimestamp() +
+                ", media=" + getMedia() +
                 '}';
     }
 
@@ -163,12 +175,26 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         TIMESTAMP,
         DATA,
         RAW_DATA,
+        MEDIA_HASH,
+        MEDIA_SIZE,
+        MEDIA_NAME,
+        MEDIA_DURATION,
+        MEDIA_MIME_TYPE,
+        MEDIA_WA_TYPE,
+        MEDIA_URL,
         STATUS,
         KEY_ID,
         LONGITUDE,
         LATITUDE,
         NEEDS_PUSH,
-        RECIPIENT_COUNT;
+        RECIPIENT_COUNT,
+        THUMB_IMAGE,
+        ORIGIN,
+        RECEIVED_TIMESTAMP,
+        SEND_TIMESTAMP,
+        RECEIPT_SERVER_TIMESTAMP,
+        RECEIPT_DEVICE_TIMESTAMP
+        ;
 
         @Override public String toString() {
             return this.name().toLowerCase(Locale.ENGLISH);

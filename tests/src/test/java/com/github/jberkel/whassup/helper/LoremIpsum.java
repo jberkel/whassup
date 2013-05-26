@@ -19,7 +19,7 @@
    THE SOFTWARE. 
 */
 
-package com.github.jberkel.whassup;
+package com.github.jberkel.whassup.helper;
 
 /**
  * Simple lorem ipsum text generator.

@@ -1,10 +1,103 @@
 package com.github.jberkel.whassup.model;
 
+import android.database.Cursor;
+import com.whatsapp.MediaData;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.*;
+
 public class Media {
+    // https://mms831.whatsapp.net/d/mLiu1j3jlniKtF8IzYoEaubS43c/AlIMgZabrwNZRdGQlq2sxEEvO2b_Cej4y5dlcFTjnHOY.jpg
     String media_url;
+
+    // image/jpeg
     String media_mime_type;
+
+    // 1 ?
     String media_wa_type;
+
+    // size of media_url content
     int media_size;
+
+    int media_duration;
+
     String media_name;
+
+    // EXo/UFC/8oxyHLRSRRRh7ZjoRfkyhNxqnQqBsB+2L/8=
     String media_hash;
+
+    /**
+     * Thumbnail representation of image.
+     */
+    byte[] raw_data;
+
+    /**
+     * Java serialized representation of {@link MediaData}
+     */
+    byte[] thumb_image;
+
+    private MediaData mediaData;
+
+    public Media() {
+    }
+
+    public Media(Cursor c) {
+        this.raw_data = c.getBlob(c.getColumnIndex(RAW_DATA.toString()));
+        this.thumb_image = c.getBlob(c.getColumnIndex(THUMB_IMAGE.toString()));
+        this.media_hash = c.getString(c.getColumnIndex(MEDIA_HASH.toString()));
+        this.media_size = c.getInt(c.getColumnIndex(MEDIA_SIZE.toString()));
+        this.media_name = c.getString(c.getColumnIndex(MEDIA_NAME.toString()));
+        this.media_duration = c.getInt(c.getColumnIndex(MEDIA_DURATION.toString()));
+        this.media_mime_type = c.getString(c.getColumnIndex(MEDIA_MIME_TYPE.toString()));
+        this.media_url = c.getString(c.getColumnIndex(MEDIA_URL.toString()));
+        this.media_wa_type = c.getString(c.getColumnIndex(MEDIA_WA_TYPE.toString()));
+    }
+
+    public MediaData getMediaData() {
+        if (mediaData == null) {
+            if (thumb_image != null) {
+                mediaData = parseData(thumb_image);
+            }
+        }
+        return mediaData;
+    }
+
+    public byte[] getRawData() {
+        return raw_data;
+    }
+
+    public String getMimeType() {
+        return media_mime_type;
+    }
+
+    public String getUrl() {
+        return media_url;
+    }
+
+    public int getSize() {
+        return media_size;
+    }
+
+    private static MediaData parseData(byte[] data) {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+            return (MediaData) ois.readObject();
+        } catch (IOException ignored) {
+        } catch (ClassNotFoundException ignored) {
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "Media{" +
+                "media_url='" + media_url + '\'' +
+                ", media_mime_type='" + media_mime_type + '\'' +
+                ", mediaData=" + getMediaData() +
+                ", media_size=" + media_size +
+                '}';
+    }
 }
