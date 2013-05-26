@@ -4,6 +4,7 @@ import android.database.Cursor;
 import com.whatsapp.MediaData;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -56,15 +57,6 @@ public class Media {
         this.media_wa_type = c.getString(c.getColumnIndex(MEDIA_WA_TYPE.toString()));
     }
 
-    public MediaData getMediaData() {
-        if (mediaData == null) {
-            if (thumb_image != null) {
-                mediaData = parseData(thumb_image);
-            }
-        }
-        return mediaData;
-    }
-
     public byte[] getRawData() {
         return raw_data;
     }
@@ -79,6 +71,25 @@ public class Media {
 
     public int getSize() {
         return media_size;
+    }
+
+    public File getFile() {
+        MediaData md = getMediaData();
+        return md == null ? null : md.getFile();
+    }
+
+    public long getFileSize() {
+        MediaData md = getMediaData();
+        return md == null ? -1 : md.getFileSize();
+    }
+
+    private MediaData getMediaData() {
+        if (mediaData == null) {
+            if (thumb_image != null) {
+                mediaData = parseData(thumb_image);
+            }
+        }
+        return mediaData;
     }
 
     private static MediaData parseData(byte[] data) {

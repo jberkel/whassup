@@ -42,7 +42,10 @@ import java.util.Locale;
 public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     public static final String TABLE = "messages";
 
-    public WhatsAppMessage() {}
+    public WhatsAppMessage() {
+        this.media = new Media();
+        this.receipt = new Receipt();
+    }
 
     public WhatsAppMessage(Cursor c) {
         this._id = c.getLong(c.getColumnIndex(BaseColumns._ID));
@@ -152,6 +155,12 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
 
     public Receipt getReceipt() {
         return receipt;
+    }
+
+    public boolean hasMediaAttached() {
+        return media.getFile() != null &&
+                media.getFile().exists() &&
+                media.getFile().canRead();
     }
 
     @Override

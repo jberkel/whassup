@@ -10,6 +10,9 @@ public class Receipt {
     long receipt_server_timestamp;
     long receipt_device_timestamp;
 
+    public Receipt() {
+    }
+
     public Receipt(Cursor cursor) {
         this.receipt_device_timestamp = cursor.getLong(cursor.getColumnIndex(RECEIPT_DEVICE_TIMESTAMP.toString()));
         this.send_timestamp = cursor.getLong(cursor.getColumnIndex(SEND_TIMESTAMP.toString()));

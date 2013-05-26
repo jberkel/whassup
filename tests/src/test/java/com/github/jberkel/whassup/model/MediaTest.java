@@ -1,6 +1,5 @@
 package com.github.jberkel.whassup.model;
 
-import com.whatsapp.MediaData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -16,11 +15,9 @@ public class MediaTest {
     public void testDeserializeThumbImage() throws Exception {
         Media media = new Media();
         media.thumb_image = fileToBytes(Fixtures.THUMB_IMAGE);
-        MediaData md = media.getMediaData();
-        assertThat(md).isNotNull();
-        assertThat(md.getFile().getAbsolutePath()).isEqualTo("/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20130526-WA0000.jpg");
-        assertThat(md.getProgress()).isEqualTo(100);
-        assertThat(md.getFileSize()).isEqualTo(67731L);
-        assertThat(md.isTransferred()).isTrue();
+
+        assertThat(media.getFile()).isNotNull();
+        assertThat(media.getFile().getAbsolutePath()).isEqualTo("/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20130526-WA0000.jpg");
+        assertThat(media.getFileSize()).isEqualTo(67731L);
     }
 }
