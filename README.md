@@ -1,6 +1,8 @@
 # whassup library
 
-Provides access to WhatsApp messages stored on your Android phone, provided that automatic backups are enabled in the settings. For information about WhatsApp's security see the [WhatsApp Database Encryption Report].
+Provides access to WhatsApp messages stored on your Android phone, provided that automatic
+backups are enabled in the settings. For information about WhatsApp's "security" see the
+[WhatsApp Database Encryption Report].
 
 ## usage
 
@@ -29,15 +31,14 @@ import com.github.jberkel.whassup.Whassup;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 public void fetchMessages() {
-	Whassup whassup = new Whassup();
-	try {
-	    List<WhatsAppMessage> messages = whassup.getMessages();
-	    Log.d(TAG, "got " + messages);
-	} catch (IOException e) {
-	    Log.e(TAG, "error getting messages", e);
-	    Toast.makeText(this, "Error fetching:" + e.getMessage(), Toast.LENGTH_LONG).show();
-	}
-}
+    Whassup whassup = new Whassup();
+    try {
+        List<WhatsAppMessage> messages = whassup.getMessages();
+        Log.d(TAG, "got " + messages);
+    } catch (IOException e) {
+        Log.e(TAG, "error getting messages", e);
+    }
+  }
 ```
 
 ##<a name="license">License</a>
