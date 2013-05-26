@@ -6,7 +6,7 @@ backups are enabled in the settings. For information about WhatsApp's "security"
 
 ## usage
 
-Install the apklib to your local maven repository (it has not been published yet).
+Install the [apklib][] to your local maven repository (it has not been published yet).
 
 ```
 $ git clone https://github.com/jberkel/whassup.git
@@ -41,6 +41,8 @@ public void fetchMessages() {
   }
 ```
 
+Check [ExampleActivity] for a more complete example.
+
 ##<a name="license">License</a>
 
 This application is released under the terms of the [Apache License, Version 2.0][].
@@ -48,5 +50,5 @@ This application is released under the terms of the [Apache License, Version 2.0
 [Apache License, Version 2.0]: http://www.apache.org/licenses/LICENSE-2.0.html
 
 [apklib]: https://code.google.com/p/maven-android-plugin/wiki/ApkLib
-[whassup]: https://github.com/jberkel/whassup/blob/master/library/src/main/java/com/github/jberkel/whassup/Whassup.java
 [WhatsApp Database Encryption Report]: https://www.os3.nl/_media/2011-2012/students/ssn_project_report.pdf
+[ExampleActivity]: https://github.com/jberkel/whassup/blob/master/example/src/main/java/com/github/jberkel/whassup/ExampleActivity.java
