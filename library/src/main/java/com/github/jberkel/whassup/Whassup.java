@@ -136,7 +136,8 @@ public class Whassup {
             dbCrypto.decryptDB(in, out);
             return out;
         } catch (GeneralSecurityException e) {
-            throw new IOException("Could not decrypt db", e);
+            Log.w(TAG, e);
+            throw new IOException("Could not decrypt db: "+e.getMessage());
         }
     }
 
