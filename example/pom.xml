@@ -30,7 +30,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>library</artifactId>
             <version>${project.version}</version>
-            <type>apklib</type>
+            <type>jar</type>
             <scope>compile</scope>
        </dependency>
 
