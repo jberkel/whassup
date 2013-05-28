@@ -42,6 +42,9 @@ import java.util.Locale;
 public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     public static final String TABLE = "messages";
 
+    private static final String GROUP  = "g.us";
+    private static final String DIRECT = "s.whatsapp.net";
+
     public WhatsAppMessage() {
         this.media = new Media();
         this.receipt = new Receipt();
@@ -67,7 +70,8 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     long _id;
 
     /**
-     * 49157712345@s.whatsapp.net
+     * 49157712345@s.whatsapp.net  (single recipient)
+     * 49157712345-1369779058@g.us (group message)
      */
     String key_remote_jid;
 
@@ -82,7 +86,10 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     String key_id;
 
     /**
+     * 0 = ?
      * 5 = recipient received message
+     * 4 = group related?
+     * 6 = group related?
      */
     int status;
 
@@ -104,9 +111,9 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     double longitude;
     double latitude;
 
-
     String remote_resource;
 
+    // > 0 for group messages
     int recipient_count;
 
     int origin;
@@ -127,6 +134,10 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         return data;
     }
 
+    public String getFilteredText() {
+        return filterPrivateBlock(data);
+    }
+
     public int getStatus() {
         return status;
     }
@@ -139,11 +150,19 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
         return latitude;
     }
 
+    public int getRecipientCount() {
+        return recipient_count;
+    }
+
     public String getNumber() {
         if (TextUtils.isEmpty(key_remote_jid)) return  null;
         String[] components = key_remote_jid.split("@", 2);
         if (components.length > 1) {
-            return components[0];
+            if (!isGroupMessage()) {
+                return components[0];
+            } else {
+                return components[0].split("-")[0];
+            }
         } else {
             return null;
         }
@@ -180,6 +199,14 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     @Override
     public int compareTo(WhatsAppMessage another) {
         return TimestampComparator.INSTANCE.compare(this, another);
+    }
+
+    public boolean isDirectMessage() {
+        return key_remote_jid != null && key_remote_jid.endsWith(DIRECT);
+    }
+
+    public boolean isGroupMessage() {
+        return key_remote_jid != null && key_remote_jid.endsWith(GROUP);
     }
 
     public enum Fields {
@@ -229,5 +256,20 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
                 return lhs.getTimestamp().compareTo(rhs.getTimestamp());
             }
         }
+    }
+
+    static String filterPrivateBlock(String s) {
+        if (s == null) return null;
+
+        final StringBuilder sb = new StringBuilder();
+        for (int i=0; i<s.length(); ) {
+            int codepoint = s.codePointAt(i);
+            Character.UnicodeBlock block = Character.UnicodeBlock.of(codepoint);
+            if (block != Character.UnicodeBlock.PRIVATE_USE_AREA) {
+                sb.append(Character.toChars(codepoint));
+            }
+            i += Character.charCount(codepoint);
+        }
+        return sb.toString();
     }
 }
