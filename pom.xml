@@ -95,12 +95,4 @@
         <module>tests</module>
         <module>example</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots />
-        </repository>
-    </repositories>
 </project>
