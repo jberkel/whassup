@@ -1,7 +1,8 @@
 package com.github.jberkel.whassup;
 
 import android.database.Cursor;
-import com.github.jberkel.whassup.crypto.DBCrypto;
+import android.database.sqlite.SQLiteException;
+import com.github.jberkel.whassup.crypto.DBDecryptor;
 import com.github.jberkel.whassup.model.Fixtures;
 import com.github.jberkel.whassup.model.Media;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
@@ -12,9 +13,14 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import static com.github.jberkel.whassup.Whassup.DBOpener;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -26,8 +32,13 @@ public class WhassupTest {
 
     @Before public void before() {
         initMocks(this);
-        whassup = new Whassup(new DBCrypto(), dbProvider);
-        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
+        whassup = new Whassup(new DBDecryptor(), dbProvider, new DBOpener());
+        when(dbProvider.getDBFile()).thenReturn(Fixtures.TEST_DB_1);
+    }
+
+    @Test
+    public void shouldDecryptFileFromConstructor() throws Exception {
+        assertThat(new Whassup(Fixtures.TEST_DB_1).getMessages()).hasSize(82);
     }
 
     @Test
@@ -102,9 +113,16 @@ public class WhassupTest {
 
     @Test
     public void shouldCheckIfDbIsAvailable() throws Exception {
-        when(dbProvider.getCurrent()).thenReturn(null);
+        when(dbProvider.getDBFile()).thenReturn(null);
         assertThat(whassup.hasBackupDB()).isFalse();
-        when(dbProvider.getCurrent()).thenReturn(Fixtures.TEST_DB_1);
+        when(dbProvider.getDBFile()).thenReturn(Fixtures.TEST_DB_1);
         assertThat(whassup.hasBackupDB()).isTrue();
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldCatchSQLiteExceptionWhenOpeningDatabase() throws Exception {
+        DBOpener dbOpener = mock(DBOpener.class);
+        when(dbOpener.openDatabase(any(File.class))).thenThrow(new SQLiteException("failz"));
+        new Whassup(new DBDecryptor(), dbProvider, dbOpener).queryMessages();
     }
 }

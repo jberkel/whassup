@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 
-public class DBCrypto {
+public class DBDecryptor {
     private static final String HEXKEY = "346a23652a46392b4d73257c67317e352e3372482177652c";
 
     public void decryptDB(File input, File output) throws IOException, GeneralSecurityException {
@@ -67,7 +67,7 @@ public class DBCrypto {
         }
         File output = new File(input.getName()+"."+mode+".sqlite");
 
-        DBCrypto decryptor = new DBCrypto();
+        DBDecryptor decryptor = new DBDecryptor();
         if ("encrypt".equals(mode)) {
             decryptor.encryptDB(input, output);
             System.out.println("Encrypted to "+output);
@@ -80,7 +80,7 @@ public class DBCrypto {
     }
 
     private static void error(String message) {
-        System.err.println(DBCrypto.class.getSimpleName()+" "+message);
+        System.err.println(DBDecryptor.class.getSimpleName()+" "+message);
         System.exit(1);
     }
 

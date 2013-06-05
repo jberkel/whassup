@@ -4,10 +4,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteQuery;
 import android.os.Environment;
 import android.util.Log;
-import com.github.jberkel.whassup.crypto.DBCrypto;
+import com.github.jberkel.whassup.crypto.DBDecryptor;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 import java.io.File;
@@ -25,16 +26,34 @@ public class Whassup {
 
     private static final String CURRENT_DB = "msgstore.db.crypt";
 
-    private final DBCrypto dbCrypto;
-    private final DBProvider dbProvider;
+    private final DBDecryptor dbDecryptor;
+    private final DBProvider  dbProvider;
+    private final DBOpener    dbOpener;
 
+    /**
+     * Default constructor, tries to automatically find the appropriate db file on
+     * the SD card.
+     */
     public Whassup() {
-        this(new DBCrypto(), new FileSystemDBProvider());
+        this(new DBDecryptor(), new DefaultDBProvider(), new DBOpener());
     }
 
-    public Whassup(DBCrypto decryptor, DBProvider dbProvider) {
-        this.dbCrypto = decryptor;
+    /**
+     * @param file path to an encrypted DB file
+     */
+    public Whassup(final File file) {
+        this(new DBDecryptor(), new DBProvider() {
+            @Override
+            public File getDBFile() {
+                return file;
+            }
+        }, new DBOpener());
+    }
+
+    /* package */ Whassup(DBDecryptor decryptor, DBProvider dbProvider, DBOpener dbOpener) {
+        this.dbDecryptor = decryptor;
         this.dbProvider = dbProvider;
+        this.dbOpener = dbOpener;
     }
 
     /**
@@ -52,7 +71,7 @@ public class Whassup {
      * @throws IOException
      */
     public Cursor queryMessages(long timestamp, int max) throws IOException {
-        File currentDB = dbProvider.getCurrent();
+        File currentDB = dbProvider.getDBFile();
         if (currentDB == null) {
             return null;
         } else {
@@ -94,7 +113,7 @@ public class Whassup {
      * @return if there is a whatsapp backup available
      */
     public boolean hasBackupDB() {
-        return dbProvider.getCurrent() != null;
+        return dbProvider.getDBFile() != null;
     }
 
     private Cursor getCursorFromDB(final File dbFile, long since, int max) throws IOException {
@@ -112,33 +131,27 @@ public class Whassup {
         }
         final String orderBy = WhatsAppMessage.Fields.TIMESTAMP + " ASC";
 
-        return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, orderBy, limit);
+        try {
+            return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, orderBy, limit);
+        } catch (SQLiteException e) {
+            Log.w(TAG, "error querying DB", e);
+            throw new IOException("Error querying DB: "+e.getMessage());
+        }
     }
 
-    private SQLiteDatabase getSqLiteDatabase(final File dbFile) {
-        return SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), new SQLiteDatabase.CursorFactory() {
-            @Override
-            @SuppressWarnings("deprecation")
-            public Cursor newCursor(final SQLiteDatabase db, SQLiteCursorDriver driver, String editTable, SQLiteQuery query) {
-                return new SQLiteCursor(db, driver, editTable, query) {
-                    @Override
-                    public void close() {
-                        Log.d(TAG, "closing cursor");
-                        super.close();
-                        db.close();
-                        if (!dbFile.delete()) {
-                            Log.w(TAG, "could not delete database " + dbFile);
-                        }
-                    }
-                };
-            }
-        }, SQLiteDatabase.OPEN_READONLY);
+    private SQLiteDatabase getSqLiteDatabase(final File dbFile) throws IOException {
+        try {
+            return dbOpener.openDatabase(dbFile);
+        } catch (SQLiteException e) {
+            Log.w(TAG, "error opening db "+dbFile, e);
+            throw new IOException("Error opening database:"+e.getMessage());
+        }
     }
 
     private File decryptDB(File in) throws IOException {
         File out = File.createTempFile("decrypted-db", ".sqlite");
         try {
-            dbCrypto.decryptDB(in, out);
+            dbDecryptor.decryptDB(in, out);
             return out;
         } catch (GeneralSecurityException e) {
             Log.w(TAG, e);
@@ -146,9 +159,9 @@ public class Whassup {
         }
     }
 
-    public static class FileSystemDBProvider implements DBProvider {
+    public static class DefaultDBProvider implements DBProvider {
         @Override
-        public File getCurrent() {
+        public File getDBFile() {
             String state = Environment.getExternalStorageState();
             if (Environment.MEDIA_MOUNTED.equals(state)) {
                 File db = new File(DB_PATH, CURRENT_DB);
@@ -167,6 +180,27 @@ public class Whassup {
                 Log.w(TAG, "external storage not mounted");
                 return null;
             }
+        }
+    }
+    /* package */ static class DBOpener {
+        public SQLiteDatabase openDatabase(final File dbFile) {
+            return SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), new SQLiteDatabase.CursorFactory() {
+                @Override
+                @SuppressWarnings("deprecation")
+                public Cursor newCursor(final SQLiteDatabase db, SQLiteCursorDriver driver, String editTable, SQLiteQuery query) {
+                    return new SQLiteCursor(db, driver, editTable, query) {
+                        @Override
+                        public void close() {
+                            Log.d(TAG, "closing cursor");
+                            super.close();
+                            db.close();
+                            if (!dbFile.delete()) {
+                                Log.w(TAG, "could not delete database " + dbFile);
+                            }
+                        }
+                    };
+                }
+            }, SQLiteDatabase.OPEN_READWRITE);
         }
     }
 }

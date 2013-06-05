@@ -1,6 +1,6 @@
 package com.github.jberkel.whassup.model;
 
-import com.github.jberkel.whassup.crypto.DBCrypto;
+import com.github.jberkel.whassup.crypto.DBDecryptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -9,10 +9,10 @@ import java.io.IOException;
 
 public class Fixtures {
     public static final File TEST_DB_1 =
-            new File(DBCrypto.class.getResource("/msgstore.db.crypt").getFile());
+            new File(DBDecryptor.class.getResource("/msgstore.db.crypt").getFile());
 
     public static final File THUMB_IMAGE =
-            new File(DBCrypto.class.getResource("/thumb_image.ser").getFile());
+            new File(DBDecryptor.class.getResource("/thumb_image.ser").getFile());
 
 
     public static byte[] fileToBytes(File in) throws IOException {

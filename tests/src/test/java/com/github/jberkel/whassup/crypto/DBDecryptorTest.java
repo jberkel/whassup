@@ -16,29 +16,29 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
-public class DBCryptoTest {
-    private DBCrypto dbCrypto;
+public class DBDecryptorTest {
+    private DBDecryptor dbDecryptor;
 
     @Before
     public void before() throws Exception {
-        dbCrypto = new DBCrypto();
+        dbDecryptor = new DBDecryptor();
     }
 
     @Test
     public void shouldDecryptDatabase() throws Exception {
         File out = File.createTempFile("db-test", ".sql");
-        dbCrypto.decryptDB(Fixtures.TEST_DB_1, out);
+        dbDecryptor.decryptDB(Fixtures.TEST_DB_1, out);
         verifyDB(out);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowWithNullInput() throws Exception {
-        dbCrypto.decryptDB(null, new File(("/out")));
+        dbDecryptor.decryptDB(null, new File(("/out")));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowWithNullOutput() throws Exception {
-        dbCrypto.decryptDB(new File(("/in")), null);
+        dbDecryptor.decryptDB(new File(("/in")), null);
     }
 
     private void verifyDB(File out) {
