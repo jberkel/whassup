@@ -46,15 +46,15 @@ public class Media {
     }
 
     public Media(Cursor c) {
-        this.raw_data = c.getBlob(c.getColumnIndex(RAW_DATA.toString()));
-        this.thumb_image = c.getBlob(c.getColumnIndex(THUMB_IMAGE.toString()));
-        this.media_hash = c.getString(c.getColumnIndex(MEDIA_HASH.toString()));
-        this.media_size = c.getInt(c.getColumnIndex(MEDIA_SIZE.toString()));
-        this.media_name = c.getString(c.getColumnIndex(MEDIA_NAME.toString()));
-        this.media_duration = c.getInt(c.getColumnIndex(MEDIA_DURATION.toString()));
-        this.media_mime_type = c.getString(c.getColumnIndex(MEDIA_MIME_TYPE.toString()));
-        this.media_url = c.getString(c.getColumnIndex(MEDIA_URL.toString()));
-        this.media_wa_type = c.getString(c.getColumnIndex(MEDIA_WA_TYPE.toString()));
+        this.raw_data        = RAW_DATA.getBlob(c);
+        this.thumb_image     = THUMB_IMAGE.getBlob(c);
+        this.media_hash      = MEDIA_HASH.getString(c);
+        this.media_size      = MEDIA_SIZE.getInt(c);
+        this.media_name      = MEDIA_NAME.getString(c);
+        this.media_duration  = MEDIA_DURATION.getInt(c);
+        this.media_mime_type = MEDIA_MIME_TYPE.getString(c);
+        this.media_url       = MEDIA_URL.getString(c);
+        this.media_wa_type   = MEDIA_WA_TYPE.getString(c);
     }
 
     public byte[] getRawData() {

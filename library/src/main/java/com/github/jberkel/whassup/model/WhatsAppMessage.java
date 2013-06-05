@@ -1,12 +1,13 @@
 package com.github.jberkel.whassup.model;
 
 import android.database.Cursor;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.*;
 
 /**
  * Represents a whatsapp message
@@ -51,21 +52,22 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     }
 
     public WhatsAppMessage(Cursor c) {
-        this._id = c.getLong(c.getColumnIndex(BaseColumns._ID));
-        this.key_remote_jid = c.getString(c.getColumnIndex(Fields.KEY_REMOTE_JID.toString()));
-        this.key_from_me = c.getInt(c.getColumnIndex(Fields.KEY_FROM_ME.toString()));
-        this.timestamp = c.getLong(c.getColumnIndex(Fields.TIMESTAMP.toString()));
-        this.data = c.getString(c.getColumnIndex(Fields.DATA.toString()));
-        this.status = c.getInt(c.getColumnIndex(Fields.STATUS.toString()));
-        this.key_id = c.getString(c.getColumnIndex(Fields.KEY_ID.toString()));
-        this.longitude = c.getDouble(c.getColumnIndex(Fields.LONGITUDE.toString()));
-        this.latitude = c.getDouble(c.getColumnIndex(Fields.LATITUDE.toString()));
-        this.needs_push = c.getInt(c.getColumnIndex(Fields.NEEDS_PUSH.toString()));
-        this.recipient_count = c.getInt(c.getColumnIndex(Fields.RECIPIENT_COUNT.toString()));
-        this.origin = c.getInt(c.getColumnIndex(Fields.ORIGIN.toString()));
-        this.media = new Media(c);
+        this._id             = _ID.getLong(c);
+        this.key_remote_jid  = KEY_REMOTE_JID.getString(c);
+        this.key_from_me     = KEY_FROM_ME.getInt(c);
+        this.timestamp       = TIMESTAMP.getLong(c);
+        this.data            = DATA.getString(c);
+        this.status          = STATUS.getInt(c);
+        this.key_id          = KEY_ID.getString(c);
+        this.longitude       = LONGITUDE.getDouble(c);
+        this.latitude        = LATITUDE.getDouble(c);
+        this.needs_push      = NEEDS_PUSH.getInt(c);
+        this.recipient_count = RECIPIENT_COUNT.getInt(c);
+        this.origin          = ORIGIN.getInt(c);
+        this.media   = new Media(c);
         this.receipt = new Receipt(c);
     }
+
 
     long _id;
 
@@ -210,6 +212,7 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     }
 
     public enum Fields {
+        _ID,
         KEY_REMOTE_JID,
         KEY_FROM_ME,
         TIMESTAMP,
@@ -238,6 +241,35 @@ public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
 
         @Override public String toString() {
             return this.name().toLowerCase(Locale.ENGLISH);
+        }
+
+        public int colIndex(Cursor c) {
+            return c.getColumnIndex(toString());
+        }
+
+        public int getInt(Cursor c) {
+            int idx = colIndex(c);
+            return idx >= 0 ? c.getInt(idx) : 0;
+        }
+
+        public long getLong(Cursor c) {
+            int idx = colIndex(c);
+            return idx >= 0 ? c.getLong(idx) : 0;
+        }
+
+        public String getString(Cursor c) {
+            int idx = colIndex(c);
+            return idx >= 0 ? c.getString(idx) : null;
+        }
+
+        public double getDouble(Cursor c) {
+            int idx = colIndex(c);
+            return idx >= 0 ? c.getDouble(idx) : 0;
+        }
+
+        public byte[] getBlob(Cursor c) {
+            int idx = colIndex(c);
+            return idx >= 0 ? c.getBlob(idx) : null;
         }
     }
 

@@ -14,10 +14,10 @@ public class Receipt {
     }
 
     public Receipt(Cursor cursor) {
-        this.receipt_device_timestamp = cursor.getLong(cursor.getColumnIndex(RECEIPT_DEVICE_TIMESTAMP.toString()));
-        this.send_timestamp = cursor.getLong(cursor.getColumnIndex(SEND_TIMESTAMP.toString()));
-        this.receipt_server_timestamp = cursor.getLong(cursor.getColumnIndex(RECEIPT_SERVER_TIMESTAMP.toString()));
-        this.received_timestamp = cursor.getLong(cursor.getColumnIndex(RECEIVED_TIMESTAMP.toString()));
+        this.receipt_device_timestamp = RECEIPT_DEVICE_TIMESTAMP.getLong(cursor);
+        this.send_timestamp           = SEND_TIMESTAMP.getLong(cursor);
+        this.receipt_server_timestamp = RECEIPT_SERVER_TIMESTAMP.getLong(cursor);
+        this.received_timestamp       = RECEIVED_TIMESTAMP.getLong(cursor);
     }
 
     @Override
