@@ -19,7 +19,7 @@ Add a maven dependency in your main project:
 <dependency>
     <groupId>com.github.jberkel.whassup</groupId>
     <artifactId>library</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 </dependency>
 ```
 
