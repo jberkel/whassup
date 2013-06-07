@@ -2,6 +2,8 @@
 
 [![Build Status](https://secure.travis-ci.org/jberkel/whassup.png?branch=master)](http://travis-ci.org/jberkel/whassup)
 
+> nothin. watching the game, decryptin' some messages. true.
+
 Provides access to WhatsApp messages stored on your Android phone, provided that automatic
 backups are enabled in the settings. For information about WhatsApp's "security" see the
 [WhatsApp Database Encryption Report].
