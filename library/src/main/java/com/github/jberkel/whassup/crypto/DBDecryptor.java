@@ -15,6 +15,7 @@ import java.security.GeneralSecurityException;
 
 public class DBDecryptor {
     private static final String HEXKEY = "346a23652a46392b4d73257c67317e352e3372482177652c";
+    private static final String CRYPTO_SPEC = "AES";
 
     public void decryptDB(File input, File output) throws IOException, GeneralSecurityException {
         if (input == null)  throw new IllegalArgumentException("input cannot be null");
@@ -65,8 +66,8 @@ public class DBDecryptor {
     }
 
     private static Cipher getCipher(int mode) throws GeneralSecurityException {
-        SecretKeySpec keyspec = new SecretKeySpec(new BigInteger(HEXKEY, 16).toByteArray(), "AES");
-        Cipher cipher = Cipher.getInstance("AES");
+        SecretKeySpec keyspec = new SecretKeySpec(new BigInteger(HEXKEY, 16).toByteArray(), CRYPTO_SPEC);
+        Cipher cipher = Cipher.getInstance(CRYPTO_SPEC);
         cipher.init(mode, keyspec);
         return cipher;
     }
