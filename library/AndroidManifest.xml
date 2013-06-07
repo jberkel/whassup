@@ -5,7 +5,4 @@
           android:versionName="0.0.1-SNAPSHOT">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="17"/>
-
-    <application>
-    </application>
 </manifest>
