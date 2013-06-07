@@ -1,4 +1,4 @@
-# whassup library
+# whassup
 
 Provides access to WhatsApp messages stored on your Android phone, provided that automatic
 backups are enabled in the settings. For information about WhatsApp's "security" see the
