@@ -1,6 +1,7 @@
 package com.github.jberkel.whassup.crypto;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 
@@ -17,13 +19,31 @@ public class DBDecryptor {
     public void decryptDB(File input, File output) throws IOException, GeneralSecurityException {
         if (input == null)  throw new IllegalArgumentException("input cannot be null");
         if (output == null) throw new IllegalArgumentException("output cannot be null");
-        FileOutputStream fos = null;
+
+        decryptStream(new FileInputStream(input), new FileOutputStream(output));
+    }
+
+    /**
+     * @param in encrypted input stream, will be closed automatically
+     * @param out the outputstream to write decrypted data to, will be closed automatically
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public void decryptStream(InputStream in, OutputStream out) throws GeneralSecurityException, IOException {
+        Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
+        CipherInputStream cis = null;
         try {
-            fos = new FileOutputStream(output);
-            byte[] byteOut = decrypt(readStream(new FileInputStream(input)));
-            fos.write(byteOut);
+            cis = new CipherInputStream(in, cipher);
+            byte[] buffer = new byte[8192];
+            int n;
+            while ((n = cis.read(buffer)) != -1)  {
+                out.write(buffer, 0, n);
+            }
         } finally {
-            if (fos != null) fos.close();
+            try {
+                if (cis != null) cis.close();
+                out.close();
+            } catch (IOException ignored) {}
         }
     }
 
@@ -37,11 +57,6 @@ public class DBDecryptor {
         } finally {
             if (fos != null) fos.close();
         }
-    }
-
-    private byte[] decrypt(byte[] input) throws GeneralSecurityException {
-        Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
-        return cipher.doFinal(input);
     }
 
     private byte[] encrypt(byte[] input) throws GeneralSecurityException {

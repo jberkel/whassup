@@ -11,6 +11,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -41,9 +43,17 @@ public class DBDecryptorTest {
         dbDecryptor.decryptDB(new File(("/in")), null);
     }
 
+    @Test
+    public void shouldDecryptStream() throws Exception {
+        File out = File.createTempFile("db-test", ".sql");
+        FileOutputStream fos = new FileOutputStream(out);
+        dbDecryptor.decryptStream(new FileInputStream(Fixtures.TEST_DB_1), fos);
+        verifyDB(out);
+    }
+
     private void verifyDB(File out) {
-        assertThat(out.exists()).isTrue();
-        assertThat(out.length()).isGreaterThan(0);
+        assertThat(out).canRead();
+        assertThat(out.length()).isGreaterThan(0L);
         SQLiteDatabase db = SQLiteDatabase.openDatabase(out.getAbsolutePath(), null, 0);
         Cursor cursor = db.query("messages", null, null, null, null, null, null);
         assertThat(cursor).isNotNull();
