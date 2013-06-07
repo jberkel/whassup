@@ -17,8 +17,7 @@ public class WhatsAppMessageTest {
     public void shouldParseTimestamp() throws Exception {
         WhatsAppMessage m = new WhatsAppMessage();
         m.timestamp = 1358086780000L;
-
-        assertThat(m.getTimestamp().toString()).isEqualTo("Sun Jan 13 15:19:40 CET 2013");
+        assertThat(m.getTimestamp().getTime()).isEqualTo(1358086780000L);
     }
 
     @Test
