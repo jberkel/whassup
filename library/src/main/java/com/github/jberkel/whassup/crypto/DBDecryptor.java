@@ -48,7 +48,7 @@ public class DBDecryptor {
         }
     }
 
-    public void encryptDB(File input, File output) throws IOException, GeneralSecurityException {
+    private void encryptDB(File input, File output) throws IOException, GeneralSecurityException {
         if (input == null ) throw new IllegalArgumentException("input cannot be null");
         if (output == null) throw new IllegalArgumentException("output cannot be null");
         FileOutputStream fos = null;
