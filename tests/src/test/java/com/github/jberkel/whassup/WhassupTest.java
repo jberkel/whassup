@@ -86,7 +86,8 @@ public class WhassupTest {
 
     @Test
     public void shouldGetMostRecentTimestamp() throws Exception {
-        assertThat(whassup.getMostRecentTimestamp()).isEqualTo(1369589322298L);
+        assertThat(whassup.getMostRecentTimestamp(true)).isEqualTo(1369589322298L);
+        assertThat(whassup.getMostRecentTimestamp(false)).isEqualTo(1369589322298L);
     }
 
     @Test

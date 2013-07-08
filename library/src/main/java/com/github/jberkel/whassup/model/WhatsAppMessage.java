@@ -43,8 +43,8 @@ import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.*;
 public class WhatsAppMessage implements Comparable<WhatsAppMessage> {
     public static final String TABLE = "messages";
 
-    private static final String GROUP  = "g.us";
-    private static final String DIRECT = "s.whatsapp.net";
+    public static final String GROUP  = "g.us";
+    public static final String DIRECT = "s.whatsapp.net";
 
     public WhatsAppMessage() {
         this.media = new Media();

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.KEY_REMOTE_JID;
 import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.TIMESTAMP;
 
 public class Whassup {
@@ -83,10 +84,11 @@ public class Whassup {
     }
 
     /**
+     * @param ignoreGroups whether group messages should be ignored
      * @return the most recent timestamp found in the WhatsApp db, or -1 if not known
      * @throws IOException
      */
-    public long getMostRecentTimestamp() throws IOException {
+    public long getMostRecentTimestamp(boolean ignoreGroups) throws IOException {
         File currentDB = dbProvider.getDBFile();
         if (currentDB == null) {
             return DEFAULT_MOST_RECENT;
@@ -94,8 +96,15 @@ public class Whassup {
             SQLiteDatabase db = getSqLiteDatabase(decryptDB(currentDB));
             Cursor cursor = null;
             try {
-                cursor = db.rawQuery("SELECT MAX("+TIMESTAMP+") FROM "
-                        +WhatsAppMessage.TABLE, null);
+                String query = "SELECT MAX(" + TIMESTAMP + ") FROM " + WhatsAppMessage.TABLE;
+                if (ignoreGroups) {
+                    query += " WHERE " + KEY_REMOTE_JID + " NOT LIKE ?";
+                }
+
+                cursor = db.rawQuery(
+                    query,
+                    ignoreGroups ? new String[]{ "%@" + WhatsAppMessage.GROUP } : null
+                );
 
                 if (cursor != null && cursor.moveToNext()) {
                     return cursor.getLong(0);
