@@ -98,6 +98,7 @@ public class Media {
             return (MediaData) ois.readObject();
         } catch (IOException ignored) {
         } catch (ClassNotFoundException ignored) {
+        } catch (ClassCastException ignored) {
         }
         return null;
     }

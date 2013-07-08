@@ -20,4 +20,11 @@ public class MediaTest {
         assertThat(media.getFile().getAbsolutePath()).isEqualTo("/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20130526-WA0000.jpg");
         assertThat(media.getFileSize()).isEqualTo(67731L);
     }
+
+    @Test
+    public void shouldHandleInvalidDeserializedFormat() throws Exception {
+        Media media = new Media();
+        media.thumb_image = fileToBytes(Fixtures.VECTOR_SERALIZED);
+        assertThat(media.getFile()).isNull();
+    }
 }
