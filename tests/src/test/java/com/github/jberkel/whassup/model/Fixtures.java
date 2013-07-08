@@ -14,7 +14,7 @@ public class Fixtures {
     public static final File THUMB_IMAGE =
             new File(DBDecryptor.class.getResource("/thumb_image.ser").getFile());
 
-    public static final File VECTOR_SERALIZED =
+    public static final File VECTOR_SERIALIZED =
             new File(DBDecryptor.class.getResource("/vector.ser").getFile());
 
     public static byte[] fileToBytes(File in) throws IOException {

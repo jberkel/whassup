@@ -22,9 +22,16 @@ public class MediaTest {
     }
 
     @Test
-    public void shouldHandleInvalidDeserializedFormat() throws Exception {
+    public void shouldHandleSerializedDataOfWrongType() throws Exception {
         Media media = new Media();
-        media.thumb_image = fileToBytes(Fixtures.VECTOR_SERALIZED);
+        media.thumb_image = fileToBytes(Fixtures.VECTOR_SERIALIZED);
+        assertThat(media.getFile()).isNull();
+    }
+
+    @Test
+    public void shouldHandleInvalidSerializedData() throws Exception {
+        Media media = new Media();
+        media.thumb_image = new byte[] {(byte) 0xde, (byte) 0xad, (byte) 0xbe, (byte) 0xef};
         assertThat(media.getFile()).isNull();
     }
 }
