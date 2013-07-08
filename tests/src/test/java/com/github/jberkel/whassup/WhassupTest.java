@@ -85,6 +85,11 @@ public class WhassupTest {
     }
 
     @Test
+    public void shouldGetMostRecentTimestamp() throws Exception {
+        assertThat(whassup.getMostRecentTimestamp()).isEqualTo(1369589322298L);
+    }
+
+    @Test
     public void shouldGetMedia() throws Exception {
         List<WhatsAppMessage> messages = whassup.getMessages();
         WhatsAppMessage msg = null;

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.TIMESTAMP;
+
 public class Whassup {
     private static final String TAG = Whassup.class.getSimpleName();
 
@@ -25,6 +27,7 @@ public class Whassup {
             "Whatsapp/Databases");
 
     private static final String CURRENT_DB = "msgstore.db.crypt";
+    private static final int DEFAULT_MOST_RECENT = -1;
 
     private final DBDecryptor dbDecryptor;
     private final DBProvider  dbProvider;
@@ -80,6 +83,35 @@ public class Whassup {
     }
 
     /**
+     * @return the most recent timestamp found in the WhatsApp db, or -1 if not known
+     * @throws IOException
+     */
+    public long getMostRecentTimestamp() throws IOException {
+        File currentDB = dbProvider.getDBFile();
+        if (currentDB == null) {
+            return DEFAULT_MOST_RECENT;
+        } else {
+            SQLiteDatabase db = getSqLiteDatabase(decryptDB(currentDB));
+            Cursor cursor = null;
+            try {
+                cursor = db.rawQuery("SELECT MAX("+TIMESTAMP+") FROM "
+                        +WhatsAppMessage.TABLE, null);
+
+                if (cursor != null && cursor.moveToNext()) {
+                    return cursor.getLong(0);
+                } else {
+                    return DEFAULT_MOST_RECENT;
+                }
+            } catch (SQLiteException e) {
+                Log.w(TAG, e);
+                return DEFAULT_MOST_RECENT;
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+    }
+
+    /**
      * Convenience method which reads all messages and converts them into model objects.
      * @param timestamp fetch all message since timestamp
      * @param max how many messages to fetch, -1 for all
@@ -123,13 +155,13 @@ public class Whassup {
         String selection = null;
         String[] selectionArgs = null;
         if (since > 0) {
-            selection = String.format("%s > ?", WhatsAppMessage.Fields.TIMESTAMP);
+            selection = String.format("%s > ?", TIMESTAMP);
             selectionArgs = new String[]{String.valueOf(since)};
         }
         if (max > 0) {
             limit = String.valueOf(max);
         }
-        final String orderBy = WhatsAppMessage.Fields.TIMESTAMP + " ASC";
+        final String orderBy = TIMESTAMP + " ASC";
 
         try {
             return db.query(WhatsAppMessage.TABLE, null, selection, selectionArgs, null, null, orderBy, limit);
