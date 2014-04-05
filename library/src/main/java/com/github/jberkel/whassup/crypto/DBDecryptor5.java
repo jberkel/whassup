@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import static com.github.jberkel.whassup.crypto.DBDecryptor.hexStringToByteArray;
 
@@ -62,9 +61,11 @@ public class DBDecryptor5 implements Decryptor {
     private Cipher getCipher(String email) throws GeneralSecurityException {
         final String emailMD5 = md5(email);
         final byte[] emailMD5Bytes = hexStringToByteArray(emailMD5 + emailMD5);
-        final byte[] decryptionKey = Arrays.copyOf(ENCRYPTION_KEY, 24);
 
-        for (int i = 0; i < 24; i++) {
+        final byte[] decryptionKey = new byte[24];
+        System.arraycopy(ENCRYPTION_KEY, 0, decryptionKey, 0, decryptionKey.length);
+
+        for (int i = 0; i < decryptionKey.length; i++) {
             decryptionKey[i] ^= emailMD5Bytes[i & 0xF];
         }
 

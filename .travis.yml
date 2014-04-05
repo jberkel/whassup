@@ -11,3 +11,4 @@ before_install:
 install: "mvn install -DskipTests -e -X"
 before_script: "mvn android:lint --projects library"
 script: "mvn install"
+after_failure: cat library/target/lint-results/lint-results.xml || true
