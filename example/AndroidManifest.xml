@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="0.0.1-SNAPSHOT" package="com.github.jberkel.whassup.example">
 
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="17"/>
 
     <application>

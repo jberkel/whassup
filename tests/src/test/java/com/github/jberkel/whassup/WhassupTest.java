@@ -3,6 +3,7 @@ package com.github.jberkel.whassup;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import com.github.jberkel.whassup.crypto.DBDecryptor;
+import com.github.jberkel.whassup.crypto.DecryptorFactory;
 import com.github.jberkel.whassup.model.Fixtures;
 import com.github.jberkel.whassup.model.Media;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
@@ -29,16 +30,13 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class WhassupTest {
     Whassup whassup;
     @Mock DBProvider dbProvider;
+    @Mock DecryptorFactory decryptorFactory;
 
     @Before public void before() {
         initMocks(this);
-        whassup = new Whassup(new DBDecryptor(), dbProvider, new DBOpener());
+        whassup = new Whassup(decryptorFactory, dbProvider, new DBOpener());
         when(dbProvider.getDBFile()).thenReturn(Fixtures.TEST_DB_1);
-    }
-
-    @Test
-    public void shouldDecryptFileFromConstructor() throws Exception {
-        assertThat(new Whassup(Fixtures.TEST_DB_1).getMessages()).hasSize(82);
+        when(decryptorFactory.getDecryptorForFile(Fixtures.TEST_DB_1)).thenReturn(new DBDecryptor());
     }
 
     @Test
@@ -129,6 +127,6 @@ public class WhassupTest {
     public void shouldCatchSQLiteExceptionWhenOpeningDatabase() throws Exception {
         DBOpener dbOpener = mock(DBOpener.class);
         when(dbOpener.openDatabase(any(File.class))).thenThrow(new SQLiteException("failz"));
-        new Whassup(new DBDecryptor(), dbProvider, dbOpener).queryMessages();
+        new Whassup(decryptorFactory, dbProvider, dbOpener).queryMessages();
     }
 }

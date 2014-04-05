@@ -1,14 +1,14 @@
 package com.github.jberkel.whassup;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteQuery;
-import android.os.Environment;
 import android.util.Log;
-import com.github.jberkel.whassup.crypto.DBDecryptor;
+import com.github.jberkel.whassup.crypto.DecryptorFactory;
 import com.github.jberkel.whassup.model.WhatsAppMessage;
 
 import java.io.File;
@@ -22,15 +22,10 @@ import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.KEY_REMOTE
 import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.TIMESTAMP;
 
 public class Whassup {
-    private static final String TAG = Whassup.class.getSimpleName();
-
-    private static final File DB_PATH = new File(Environment.getExternalStorageDirectory(),
-            "Whatsapp/Databases");
-
-    private static final String CURRENT_DB = "msgstore.db.crypt";
+    protected static final String TAG = Whassup.class.getSimpleName();
     private static final int DEFAULT_MOST_RECENT = -1;
 
-    private final DBDecryptor dbDecryptor;
+    private final DecryptorFactory dbDecryptor;
     private final DBProvider  dbProvider;
     private final DBOpener    dbOpener;
 
@@ -38,24 +33,12 @@ public class Whassup {
      * Default constructor, tries to automatically find the appropriate db file on
      * the SD card.
      */
-    public Whassup() {
-        this(new DBDecryptor(), new DefaultDBProvider(), new DBOpener());
+    public Whassup(Context context) {
+        this(new DecryptorFactory(context.getApplicationContext()), new DefaultDBProvider(), new DBOpener());
     }
 
-    /**
-     * @param file path to an encrypted DB file
-     */
-    public Whassup(final File file) {
-        this(new DBDecryptor(), new DBProvider() {
-            @Override
-            public File getDBFile() {
-                return file;
-            }
-        }, new DBOpener());
-    }
-
-    /* package */ Whassup(DBDecryptor decryptor, DBProvider dbProvider, DBOpener dbOpener) {
-        this.dbDecryptor = decryptor;
+    /* package */ Whassup(DecryptorFactory decryptorFactory, DBProvider dbProvider, DBOpener dbOpener) {
+        this.dbDecryptor = decryptorFactory;
         this.dbProvider = dbProvider;
         this.dbOpener = dbOpener;
     }
@@ -192,7 +175,7 @@ public class Whassup {
     private File decryptDB(File in) throws IOException {
         File out = File.createTempFile("decrypted-db", ".sqlite");
         try {
-            dbDecryptor.decryptDB(in, out);
+            dbDecryptor.getDecryptorForFile(in).decryptDB(in, out);
             return out;
         } catch (GeneralSecurityException e) {
             Log.w(TAG, e);
@@ -200,29 +183,6 @@ public class Whassup {
         }
     }
 
-    public static class DefaultDBProvider implements DBProvider {
-        @Override
-        public File getDBFile() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                File db = new File(DB_PATH, CURRENT_DB);
-                if (db.exists()) {
-                    if (db.canRead()) {
-                        return db;
-                    } else {
-                        Log.d(TAG, "db "+db+" exists but is not readable");
-                        return null;
-                    }
-                } else {
-                    Log.d(TAG, "db "+db+" does not exist");
-                    return null;
-                }
-            } else {
-                Log.w(TAG, "external storage not mounted");
-                return null;
-            }
-        }
-    }
     /* package */ static class DBOpener {
         public SQLiteDatabase openDatabase(final File dbFile) {
             return SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), new SQLiteDatabase.CursorFactory() {

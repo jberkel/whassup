@@ -10,11 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 
-public class DBDecryptor {
-    private static final String HEXKEY = "346a23652a46392b4d73257c67317e352e3372482177652c";
+public class DBDecryptor implements Decryptor {
+    private static final byte[] ENCRYPTON_KEY = hexStringToByteArray("346a23652a46392b4d73257c67317e352e3372482177652c");
     private static final String CRYPTO_SPEC = "AES";
 
     public void decryptDB(File input, File output) throws IOException, GeneralSecurityException {
@@ -30,7 +29,7 @@ public class DBDecryptor {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    public void decryptStream(InputStream in, OutputStream out) throws GeneralSecurityException, IOException {
+    protected void decryptStream(InputStream in, OutputStream out) throws GeneralSecurityException, IOException {
         Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
         CipherInputStream cis = null;
         try {
@@ -66,7 +65,7 @@ public class DBDecryptor {
     }
 
     private static Cipher getCipher(int mode) throws GeneralSecurityException {
-        SecretKeySpec keyspec = new SecretKeySpec(new BigInteger(HEXKEY, 16).toByteArray(), CRYPTO_SPEC);
+        SecretKeySpec keyspec = new SecretKeySpec(ENCRYPTON_KEY, CRYPTO_SPEC);
         Cipher cipher = Cipher.getInstance(CRYPTO_SPEC);
         cipher.init(mode, keyspec);
         return cipher;
@@ -112,5 +111,14 @@ public class DBDecryptor {
             is.close();
         }
         return bos.toByteArray();
+    }
+
+    protected static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
     }
 }
