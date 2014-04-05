@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 
 public class DBDecryptor implements Decryptor {
-    private static final byte[] ENCRYPTON_KEY = hexStringToByteArray("346a23652a46392b4d73257c67317e352e3372482177652c");
+    private static final byte[] ENCRYPTION_KEY = hexStringToByteArray("346a23652a46392b4d73257c67317e352e3372482177652c");
     private static final String CRYPTO_SPEC = "AES";
 
     public void decryptDB(File input, File output) throws IOException, GeneralSecurityException {
@@ -65,7 +65,7 @@ public class DBDecryptor implements Decryptor {
     }
 
     private static Cipher getCipher(int mode) throws GeneralSecurityException {
-        SecretKeySpec keyspec = new SecretKeySpec(ENCRYPTON_KEY, CRYPTO_SPEC);
+        SecretKeySpec keyspec = new SecretKeySpec(ENCRYPTION_KEY, CRYPTO_SPEC);
         Cipher cipher = Cipher.getInstance(CRYPTO_SPEC);
         cipher.init(mode, keyspec);
         return cipher;
