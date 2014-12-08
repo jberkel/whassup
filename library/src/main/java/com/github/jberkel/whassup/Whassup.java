@@ -22,7 +22,7 @@ import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.KEY_REMOTE
 import static com.github.jberkel.whassup.model.WhatsAppMessage.Fields.TIMESTAMP;
 
 public class Whassup {
-    protected static final String TAG = Whassup.class.getSimpleName();
+    public static final String TAG = Whassup.class.getSimpleName();
     private static final int DEFAULT_MOST_RECENT = -1;
 
     private final DecryptorFactory dbDecryptor;

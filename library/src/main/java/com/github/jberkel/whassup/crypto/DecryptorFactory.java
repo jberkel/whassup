@@ -24,7 +24,9 @@ public class DecryptorFactory {
     }
 
     public Decryptor getDecryptorForFile(File file) {
-        if (file.getName().endsWith(".crypt5") && email != null) {
+    	if (file.getName().endsWith(".db")){
+    		return new DBDecryptorFake();
+    	} else if (file.getName().endsWith(".crypt5") && email != null) {
             return new DBDecryptor5(email);
         } else {
             return new DBDecryptor();
