@@ -4,7 +4,7 @@
 
     <groupId>com.github.jberkel.whassup</groupId>
     <artifactId>whassup-parent</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Whassup parent</name>
@@ -103,7 +103,7 @@
         <connection>scm:git:https://github.com/${github.username}/${github.permalink}.git</connection>
         <developerConnection>scm:git:git@github.com:${github.username}/${github.permalink}.git
         </developerConnection>
-      <tag>0.0.7</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <modules>
