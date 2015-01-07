@@ -50,9 +50,15 @@
     </build>
 
     <distributionManagement>
+      <!--
         <repository>
           <id>repo</id>
           <url>http://zegoggl.es:8081/nexus/content/repositories/releases/</url>
+        </repository>
+       -->
+        <repository>
+          <id>bintray</id>
+          <url>https://api.bintray.com/maven/jberkel/maven/whassup</url>
         </repository>
         <snapshotRepository>
             <id>snapshot-repo</id>
